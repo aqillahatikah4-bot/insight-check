@@ -156,17 +156,20 @@
 
   <script>
     async function loadCSV() {
-      try {
-        const res = await fetch("https://insight-check.onrender.com/sheet-csv");
-        if (!res.ok) throw new Error("Gagal muat CSV");
-        const text = await res.text();
-        const rows = text.split("\n").map(r => r.split(","));
-        console.log("? CSV dimuat:", rows.length, "rekod");
-        return rows;
-      } catch (err) {
-        console.error(err);
-        alert("Gagal memuat data ahli.");
-        return [];
+  try {
+    const res = await fetch("https://insight-check.onrender.com/sheet-csv");
+    if (!res.ok) throw new Error("Gagal muat CSV");
+    const text = await res.text();
+    const rows = text.split("\n").map(r => r.split(","));
+    console.log("? CSV dimuat:", rows.length, "rekod");
+    return rows;
+  } catch (err) {
+    console.error(err);
+    alert("Gagal memuat data ahli.");
+    return [];
+  }
+}
+
       }
     }
 
