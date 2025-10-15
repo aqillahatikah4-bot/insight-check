@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>INSIGHT | Semakan Ahli</title>
+  <link rel="icon" href="https://i.ibb.co/TrsfmnY/insight-favicon.png" type="image/png">
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -11,27 +12,33 @@
       margin: 0;
       padding: 0;
     }
+
     .container {
       width: 90%;
-      max-width: 850px;
+      max-width: 800px;
       margin: 40px auto;
       background: white;
       padding: 20px 30px;
       border-radius: 12px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      transition: all 0.3s ease-in-out;
     }
+
     h1 {
       text-align: center;
-      color: #ff7f27;
+      color: #007bff;
     }
+
     .header-img {
       display: block;
       margin: 0 auto 15px;
       max-width: 150px;
     }
+
     label {
       font-weight: bold;
     }
+
     input {
       padding: 10px;
       width: 100%;
@@ -39,6 +46,7 @@
       border-radius: 8px;
       border: 1px solid #ccc;
     }
+
     button {
       background-color: #007bff;
       color: white;
@@ -48,95 +56,99 @@
       cursor: pointer;
       font-weight: bold;
     }
+
     button:hover {
       background-color: #0056b3;
     }
+
     .result-container {
       display: none;
     }
+
     .info-box {
-      background: #007bff;
+      background: linear-gradient(to right, #007bff, #ff7f27);
       color: white;
-      padding: 15px;
-      border-radius: 8px;
-      margin-bottom: 15px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 15px;
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 8px;
-      text-align: left;
-    }
-    th {
-      background: #ff7f27;
-      color: white;
-    }
-    tfoot td {
-      font-weight: bold;
-      background: #eaf2ff;
-    }
-    .back-btn {
-      margin-top: 20px;
-      background-color: #ff7f27;
-    }
-    .summary-box {
-      background: #fff9f3;
-      border: 2px solid #ff7f27;
+      padding: 12px;
       border-radius: 10px;
-      padding: 15px 20px;
-      margin-top: 25px;
+      margin-bottom: 20px;
+      text-align: center;
     }
-    .summary-item {
-      display: flex;
-      justify-content: space-between;
-      border-bottom: 1px dashed #ccc;
-      padding: 6px 0;
+
+    .summary-board {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
     }
-    .summary-item strong {
+
+    .summary-card {
+      background: #eaf2ff;
+      border-left: 6px solid #007bff;
+      border-radius: 10px;
+      padding: 15px;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      transition: 0.2s;
+    }
+
+    .summary-card.orange {
+      border-left-color: #ff7f27;
+      background: #fff4ec;
+    }
+
+    .summary-card:hover {
+      transform: scale(1.02);
+    }
+
+    .summary-card h3 {
+      margin: 0;
+      color: #333;
+      font-size: 16px;
+    }
+
+    .summary-card p {
+      margin: 8px 0 0;
+      font-weight: bold;
       color: #007bff;
+    }
+
+    .summary-card.orange p {
+      color: #ff7f27;
+    }
+
+    .back-btn {
+      margin-top: 25px;
+      background-color: #ff7f27;
+      color: white;
+    }
+
+    .back-btn:hover {
+      background-color: #e86d13;
     }
   </style>
 </head>
 <body>
+  <!-- Laman Semakan -->
   <div class="container" id="semakContainer">
-    <img src="https://i.ibb.co/nC9s3Pr/insight-logo.png" class="header-img" alt="INSIGHT Logo">
+    <img src="logo.jpg" class="header-img" alt="INSIGHT Logo">
     <h1>SISTEM SEMAKAN AHLI INSIGHT</h1>
     <label for="ic">Masukkan No. Kad Pengenalan:</label>
     <input type="text" id="ic" placeholder="Contoh: 900102031234">
     <button onclick="semakData()">SEMAK</button>
   </div>
 
+  <!-- Laman Hasil Carian -->
   <div class="container result-container" id="resultContainer">
     <div class="info-box">
       <h2>HASIL CARIAN SISTEM SEMAKAN AHLI</h2>
     </div>
     <div id="maklumatAhli"></div>
-    <table id="planTable">
-      <thead>
-        <tr>
-          <th>BIL</th>
-          <th>NAMA PLAN</th>
-          <th>IMBUHAN (RM)</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-      <tfoot>
-        <tr>
-          <td colspan="2">JUMLAH KESELURUHAN</td>
-          <td id="jumlah"></td>
-        </tr>
-      </tfoot>
-    </table>
 
-    <div class="summary-box" id="summaryBox">
-      <h3 style="color:#ff7f27;">Ringkasan Jumlah Mengikut Kategori</h3>
-      <div id="summaryContent"></div>
+    <div class="summary-board" id="summaryBoard"></div>
+
+    <div class="summary-card orange" style="grid-column: 1 / -1; margin-top: 20px;">
+      <h3>JUMLAH KESELURUHAN</h3>
+      <p id="jumlahKeseluruhan">RM 0.00</p>
     </div>
 
     <button class="back-btn" onclick="kembali()">KEMBALI</button>
@@ -176,10 +188,12 @@
         return;
       }
 
+      // Tukar paparan
       document.getElementById("semakContainer").style.display = "none";
       const resultDiv = document.getElementById("resultContainer");
       resultDiv.style.display = "block";
 
+      // Maklumat ahli
       document.getElementById("maklumatAhli").innerHTML = `
         <p><b>Nama Penuh:</b> ${match[0]}</p>
         <p><b>No. Kad Pengenalan:</b> ${match[1]}</p>
@@ -188,16 +202,9 @@
         <p><b>No. Akaun:</b> ${match[5]}</p>
       `;
 
-      const tableBody = document.querySelector("#planTable tbody");
-      tableBody.innerHTML = "";
+      const summaryDiv = document.getElementById("summaryBoard");
+      summaryDiv.innerHTML = "";
       let total = 0;
-
-      const kategori = {
-        "PLATINUM": 0,
-        "EXCLUSIVE": 0,
-        "MASTER": 0,
-        "VIP": 0
-      };
 
       headers.slice(6).forEach((plan, i) => {
         const nilai = match[i + 6]?.trim();
@@ -205,43 +212,16 @@
           const num = Number(nilai.replace(/[^0-9.]/g, "")) || 0;
           total += num;
 
-          // Tambah ke kategori
-          if (plan.toUpperCase().includes("PLATINUM")) kategori.PLATINUM += num;
-          else if (plan.toUpperCase().includes("EXCLUSIVE")) kategori.EXCLUSIVE += num;
-          else if (plan.toUpperCase().includes("MASTER")) kategori.MASTER += num;
-          else if (plan.toUpperCase().includes("VIP")) kategori.VIP += num;
-
-          tableBody.innerHTML += `
-            <tr>
-              <td>${i + 1}</td>
-              <td>${plan}</td>
-              <td>${nilai}</td>
-            </tr>
-          `;
-        }
-      });
-
-      document.getElementById("jumlah").innerText = "RM " + total.toLocaleString();
-
-      // Ringkasan
-      const summaryDiv = document.getElementById("summaryContent");
-      summaryDiv.innerHTML = "";
-      Object.keys(kategori).forEach(k => {
-        if (kategori[k] > 0) {
           summaryDiv.innerHTML += `
-            <div class="summary-item">
-              <span><strong>${k}</strong></span>
-              <span>RM ${kategori[k].toLocaleString()}</span>
+            <div class="summary-card ${i % 2 === 0 ? '' : 'orange'}">
+              <h3>${plan}</h3>
+              <p>${nilai}</p>
             </div>
           `;
         }
       });
-      summaryDiv.innerHTML += `
-        <div class="summary-item" style="border-top:2px solid #ff7f27; margin-top:8px; padding-top:8px;">
-          <strong>JUMLAH KESELURUHAN</strong>
-          <strong style="color:#007bff;">RM ${total.toLocaleString()}</strong>
-        </div>
-      `;
+
+      document.getElementById("jumlahKeseluruhan").innerText = "RM " + total.toLocaleString();
     }
 
     function kembali() {
