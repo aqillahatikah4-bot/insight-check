@@ -13,7 +13,7 @@
     }
     .container {
       width: 90%;
-      max-width: 800px;
+      max-width: 850px;
       margin: 40px auto;
       background: white;
       padding: 20px 30px;
@@ -55,9 +55,9 @@
       display: none;
     }
     .info-box {
-      background: #ff7f27;
+      background: #007bff;
       color: white;
-      padding: 10px;
+      padding: 15px;
       border-radius: 8px;
       margin-bottom: 15px;
     }
@@ -65,6 +65,8 @@
       width: 100%;
       border-collapse: collapse;
       margin-top: 15px;
+      border-radius: 8px;
+      overflow: hidden;
     }
     th, td {
       border: 1px solid #ddd;
@@ -72,7 +74,7 @@
       text-align: left;
     }
     th {
-      background: #007bff;
+      background: #ff7f27;
       color: white;
     }
     tfoot td {
@@ -83,11 +85,27 @@
       margin-top: 20px;
       background-color: #ff7f27;
     }
+    .summary-box {
+      background: #fff9f3;
+      border: 2px solid #ff7f27;
+      border-radius: 10px;
+      padding: 15px 20px;
+      margin-top: 25px;
+    }
+    .summary-item {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px dashed #ccc;
+      padding: 6px 0;
+    }
+    .summary-item strong {
+      color: #007bff;
+    }
   </style>
 </head>
 <body>
   <div class="container" id="semakContainer">
-    <img src="logo.jpg" class="header-img" alt="INSIGHT Logo">
+    <img src="https://i.ibb.co/nC9s3Pr/insight-logo.png" class="header-img" alt="INSIGHT Logo">
     <h1>SISTEM SEMAKAN AHLI INSIGHT</h1>
     <label for="ic">Masukkan No. Kad Pengenalan:</label>
     <input type="text" id="ic" placeholder="Contoh: 900102031234">
@@ -115,6 +133,12 @@
         </tr>
       </tfoot>
     </table>
+
+    <div class="summary-box" id="summaryBox">
+      <h3 style="color:#ff7f27;">Ringkasan Jumlah Mengikut Kategori</h3>
+      <div id="summaryContent"></div>
+    </div>
+
     <button class="back-btn" onclick="kembali()">KEMBALI</button>
   </div>
 
@@ -152,12 +176,10 @@
         return;
       }
 
-      // Paparkan hasil
       document.getElementById("semakContainer").style.display = "none";
       const resultDiv = document.getElementById("resultContainer");
       resultDiv.style.display = "block";
 
-      // Maklumat ahli
       document.getElementById("maklumatAhli").innerHTML = `
         <p><b>Nama Penuh:</b> ${match[0]}</p>
         <p><b>No. Kad Pengenalan:</b> ${match[1]}</p>
@@ -170,11 +192,25 @@
       tableBody.innerHTML = "";
       let total = 0;
 
+      const kategori = {
+        "PLATINUM": 0,
+        "EXCLUSIVE": 0,
+        "MASTER": 0,
+        "VIP": 0
+      };
+
       headers.slice(6).forEach((plan, i) => {
         const nilai = match[i + 6]?.trim();
         if (nilai && nilai !== "-") {
           const num = Number(nilai.replace(/[^0-9.]/g, "")) || 0;
           total += num;
+
+          // Tambah ke kategori
+          if (plan.toUpperCase().includes("PLATINUM")) kategori.PLATINUM += num;
+          else if (plan.toUpperCase().includes("EXCLUSIVE")) kategori.EXCLUSIVE += num;
+          else if (plan.toUpperCase().includes("MASTER")) kategori.MASTER += num;
+          else if (plan.toUpperCase().includes("VIP")) kategori.VIP += num;
+
           tableBody.innerHTML += `
             <tr>
               <td>${i + 1}</td>
@@ -186,6 +222,26 @@
       });
 
       document.getElementById("jumlah").innerText = "RM " + total.toLocaleString();
+
+      // Ringkasan
+      const summaryDiv = document.getElementById("summaryContent");
+      summaryDiv.innerHTML = "";
+      Object.keys(kategori).forEach(k => {
+        if (kategori[k] > 0) {
+          summaryDiv.innerHTML += `
+            <div class="summary-item">
+              <span><strong>${k}</strong></span>
+              <span>RM ${kategori[k].toLocaleString()}</span>
+            </div>
+          `;
+        }
+      });
+      summaryDiv.innerHTML += `
+        <div class="summary-item" style="border-top:2px solid #ff7f27; margin-top:8px; padding-top:8px;">
+          <strong>JUMLAH KESELURUHAN</strong>
+          <strong style="color:#007bff;">RM ${total.toLocaleString()}</strong>
+        </div>
+      `;
     }
 
     function kembali() {
