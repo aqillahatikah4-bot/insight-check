@@ -4,7 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>INSIGHT | Semakan Ahli</title>
-  <link rel="icon" href="https://i.ibb.co/TrsfmnY/insight-favicon.png" type="image/png">
+
+  <!-- Favicon -->
+  <link rel="icon" href="https://i.ibb.co/gj5ghb8/insight-favicon.png" type="image/png">
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -21,7 +24,6 @@
       padding: 20px 30px;
       border-radius: 12px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      transition: all 0.3s ease-in-out;
     }
 
     h1 {
@@ -66,117 +68,102 @@
     }
 
     .info-box {
-      background: linear-gradient(to right, #007bff, #ff7f27);
+      background: #ff7f27;
       color: white;
-      padding: 12px;
-      border-radius: 10px;
-      margin-bottom: 20px;
-      text-align: center;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 15px;
     }
 
-    .summary-board {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 15px;
-      margin-top: 20px;
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
     }
 
-    .summary-card {
-      background: #eaf2ff;
-      border-left: 6px solid #007bff;
-      border-radius: 10px;
-      padding: 15px;
-      text-align: center;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      transition: 0.2s;
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
     }
 
-    .summary-card.orange {
-      border-left-color: #ff7f27;
-      background: #fff4ec;
+    th {
+      background: #007bff;
+      color: white;
     }
 
-    .summary-card:hover {
-      transform: scale(1.02);
-    }
-
-    .summary-card h3 {
-      margin: 0;
-      color: #333;
-      font-size: 16px;
-    }
-
-    .summary-card p {
-      margin: 8px 0 0;
+    tfoot td {
       font-weight: bold;
-      color: #007bff;
-    }
-
-    .summary-card.orange p {
-      color: #ff7f27;
+      background: #eaf2ff;
     }
 
     .back-btn {
-      margin-top: 25px;
+      margin-top: 20px;
       background-color: #ff7f27;
-      color: white;
     }
 
     .back-btn:hover {
-      background-color: #e86d13;
+      background-color: #e66e00;
     }
   </style>
 </head>
 <body>
-  <!-- Laman Semakan -->
   <div class="container" id="semakContainer">
-    <img src="logo.jpg" class="header-img" alt="INSIGHT Logo">
+    <img src="https://i.ibb.co/df8XLRk/insight-logo.jpg" class="header-img" alt="INSIGHT Logo">
     <h1>SISTEM SEMAKAN AHLI INSIGHT</h1>
     <label for="ic">Masukkan No. Kad Pengenalan:</label>
     <input type="text" id="ic" placeholder="Contoh: 900102031234">
     <button onclick="semakData()">SEMAK</button>
   </div>
 
-  <!-- Laman Hasil Carian -->
   <div class="container result-container" id="resultContainer">
     <div class="info-box">
       <h2>HASIL CARIAN SISTEM SEMAKAN AHLI</h2>
     </div>
     <div id="maklumatAhli"></div>
-
-    <div class="summary-board" id="summaryBoard"></div>
-
-    <div class="summary-card orange" style="grid-column: 1 / -1; margin-top: 20px;">
-      <h3>JUMLAH KESELURUHAN</h3>
-      <p id="jumlahKeseluruhan">RM 0.00</p>
-    </div>
-
+    <table id="planTable">
+      <thead>
+        <tr>
+          <th>BIL</th>
+          <th>NAMA PLAN</th>
+          <th>IMBUHAN (RM)</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+      <tfoot>
+        <tr>
+          <td colspan="2">JUMLAH KESELURUHAN</td>
+          <td id="jumlah"></td>
+        </tr>
+      </tfoot>
+    </table>
     <button class="back-btn" onclick="kembali()">KEMBALI</button>
   </div>
 
   <script>
     async function loadCSV() {
-  try {
-    const res = await fetch("https://insight-check.onrender.com/sheet-csv");
-    if (!res.ok) throw new Error("Gagal muat CSV");
-    const text = await res.text();
-    const rows = text.split("\n").map(r => r.split(","));
-    console.log("? CSV dimuat:", rows.length, "rekod");
-    return rows;
-  } catch (err) {
-    console.error(err);
-    alert("Gagal memuat data ahli.");
-    return [];
-  }
-}
-
+      try {
+        const res = await fetch("https://insight-check.onrender.com/sheet-csv");
+        if (!res.ok) throw new Error("Gagal muat CSV");
+        const text = await res.text();
+        const rows = text.split("\n").map(r => r.split(","));
+        console.log("? CSV dimuat:", rows.length, "rekod");
+        return rows;
+      } catch (err) {
+        console.error(err);
+        alert("Gagal memuat data ahli.");
+        return [];
       }
     }
 
     async function semakData() {
       const ic = document.getElementById("ic").value.replace(/-/g, "").trim();
-      const csv = await loadCSV();
+      if (!ic) {
+        alert("Sila masukkan No. Kad Pengenalan!");
+        return;
+      }
 
+      const csv = await loadCSV();
       if (!csv.length) {
         alert("Data tidak dapat dimuat.");
         return;
@@ -191,7 +178,7 @@
         return;
       }
 
-      // Tukar paparan
+      // Paparkan hasil
       document.getElementById("semakContainer").style.display = "none";
       const resultDiv = document.getElementById("resultContainer");
       resultDiv.style.display = "block";
@@ -205,8 +192,8 @@
         <p><b>No. Akaun:</b> ${match[5]}</p>
       `;
 
-      const summaryDiv = document.getElementById("summaryBoard");
-      summaryDiv.innerHTML = "";
+      const tableBody = document.querySelector("#planTable tbody");
+      tableBody.innerHTML = "";
       let total = 0;
 
       headers.slice(6).forEach((plan, i) => {
@@ -214,17 +201,17 @@
         if (nilai && nilai !== "-") {
           const num = Number(nilai.replace(/[^0-9.]/g, "")) || 0;
           total += num;
-
-          summaryDiv.innerHTML += `
-            <div class="summary-card ${i % 2 === 0 ? '' : 'orange'}">
-              <h3>${plan}</h3>
-              <p>${nilai}</p>
-            </div>
+          tableBody.innerHTML += `
+            <tr>
+              <td>${i + 1}</td>
+              <td>${plan}</td>
+              <td>${nilai}</td>
+            </tr>
           `;
         }
       });
 
-      document.getElementById("jumlahKeseluruhan").innerText = "RM " + total.toLocaleString();
+      document.getElementById("jumlah").innerText = "RM " + total.toLocaleString();
     }
 
     function kembali() {
