@@ -1,252 +1,151 @@
 <!DOCTYPE html>
 <html lang="ms">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hasil Carian Sistem Semakan Ahli Insight</title>
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Semakan Ahli Insight</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #000;
-      color: #000;
+      background: #f8f9fa;
+      text-align: center;
       margin: 0;
       padding: 0;
     }
-    .header {
-      background-color: #0033cc;
-      color: white;
-      text-align: center;
-      padding: 10px;
-      font-weight: bold;
-      font-size: 22px;
+
+    .container {
+      max-width: 600px;
+      background: white;
+      margin: 50px auto;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
     }
-    .content {
-      background-color: #fff;
-      max-width: 900px;
-      margin: 20px auto;
-      border: 3px solid #ff0000;
-      border-radius: 5px;
-      padding: 15px;
-    }
-    .info-box {
-      background-color: #c00000;
-      color: white;
-      padding: 10px;
-      border-radius: 5px;
+
+    img.logo {
+      width: 150px;
       margin-bottom: 10px;
     }
-    .info-table {
-      width: 100%;
-      background: #f0f0f0;
-      border-collapse: collapse;
-      margin-bottom: 20px;
+
+    input {
+      width: 80%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
     }
-    .info-table td {
-      padding: 6px 10px;
+
+    button {
+      margin-top: 15px;
+      padding: 10px 25px;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
     }
-    .info-table td:first-child {
-      width: 180px;
-      font-weight: bold;
+
+    button:hover {
+      background-color: #0056b3;
     }
-    .plan-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 14px;
-    }
-    .plan-table th, .plan-table td {
-      border: 1px solid #000;
-      padding: 6px;
+
+    #result {
+      margin-top: 20px;
       text-align: left;
     }
-    .plan-table th {
-      background-color: #0033cc;
-      color: white;
-      text-align: center;
-    }
-    .plan-table td:nth-child(3),
-    .plan-table td:nth-child(4) {
-      text-align: right;
-    }
-    .search-box {
-      background: #fff;
-      padding: 20px;
-      text-align: center;
-      margin: 50px auto;
-      width: 350px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.3);
-    }
-    input, button {
-      width: 90%;
+
+    .summary {
+      background: #e9ecef;
       padding: 10px;
-      margin: 8px;
-      font-size: 16px;
+      border-radius: 10px;
+      margin-top: 15px;
     }
-    button {
-      background-color: #0033cc;
-      color: white;
-      border: none;
-      cursor: pointer;
-      border-radius: 5px;
-    }
-    button:hover {
-      background-color: #001f7f;
-    }
-    .btn-kembali {
-      background-color: #c00000;
-      color: white;
-      font-weight: bold;
-      padding: 10px 20px;
-      border-radius: 8px;
-      margin-top: 20px;
-    }
-    .btn-kembali:hover {
-      background-color: #7f0000;
-    }
-    .total-box {
-      text-align: right;
-      font-weight: bold;
-      margin-top: 10px;
-      font-size: 16px;
-    }
-    .logo {
-      width: 200px;
-      margin-bottom: 10px;
+
+    .hidden {
+      display: none;
     }
   </style>
 </head>
 <body>
-
-  <div class="search-box" id="searchBox">
-    <img src="logo.jpg" alt="INSIGHT Logo" class="logo"><link rel="icon" type="image/x-icon" href="favicon.ico">
-
-    <h2>Semakan Data Ahli</h2>
-    <input type="text" id="icInput" placeholder="Masukkan No IC tanpa -">
-    <button onclick="semakData()">Semak</button>
-    <p id="status"></p>
+  <div class="container" id="semakContainer">
+    <img src="logo.jpg" alt="Logo" class="logo">
+    <h2>Semakan Ahli Insight</h2>
+    <p>Masukkan Nombor Kad Pengenalan:</p>
+    <input type="text" id="inputIC" placeholder="contoh: 900102031234">
+    <br>
+    <button onclick="semakData()">SEMAK</button>
   </div>
 
-  <div id="resultPage" style="display:none;">
-    <div class="header">HASIL CARIAN SISTEM SEMAKAN AHLI INSIGHT</div>
-    <div class="content">
-      <div class="info-box">
-        <strong>Maklumat Ahli</strong><br>
-        Sekiranya maklumat yang dinyatakan di bawah tidak tepat, sila maklumkan ADMIN dengan maklumat lengkap anda.
-      </div>
+  <div class="container hidden" id="resultContainer">
+    <h3 id="nama"></h3>
+    <p><strong>No. IC:</strong> <span id="ic"></span></p>
+    <p><strong>Plan:</strong> <span id="plan"></span></p>
+    <p><strong>No. Telefon:</strong> <span id="phone"></span></p>
+    <p><strong>Nama Bank:</strong> <span id="bank"></span></p>
+    <p><strong>No. Akaun:</strong> <span id="acc"></span></p>
 
-      <table class="info-table">
-        <tr><td>Nama Penuh</td><td id="nama"></td></tr>
-        <tr><td>No Kad Pengenalan</td><td id="nokp"></td></tr>
-        <tr><td>No Telefon</td><td id="notel"></td></tr>
-        <tr><td>Nama Bank</td><td id="bank"></td></tr>
-        <tr><td>No Akaun Bank</td><td id="akaun"></td></tr>
-      </table>
+    <div class="summary" id="summaryBoard"></div>
 
-      <table class="plan-table" id="planTable">
-        <thead>
-          <tr>
-            <th>BIL</th>
-            <th>NAMA PLAN</th>
-            <th>LAIN-LAIN</th>
-            <th>IMBUHAN (RM)</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-
-      <div class="total-box" id="totalBox">JUMLAH KESELURUHAN: RM0.00</div>
-
-      <div style="text-align:center;">
-        <button class="btn-kembali" onclick="kembali()">? KEMBALI</button>
-      </div>
-    </div>
+    <button onclick="kembali()">KEMBALI</button>
   </div>
 
   <script>
-    let dataAhli = [];
+    let data = [];
 
     async function loadCSV() {
-      const response = await fetch("http://127.0.0.1:5000/sheet-csv");
-      const csvText = await response.text();
-      const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
+      try {
+        const response = await fetch("https://insight-check.onrender.com/sheet-csv");
+        const csvText = await response.text();
+        console.log("? CSV dimuat:", csvText.length, "aksara");
+        data = csvToArray(csvText);
+      } catch (error) {
+        console.error("? Ralat muat CSV:", error);
+      }
+    }
 
-      dataAhli = parsed.data.map(row => {
-        const cleaned = {};
-        for (const key in row) {
-          cleaned[key.replace(/\uFEFF/g, '').trim().toUpperCase()] = (row[key] || '').trim();
-        }
-        return cleaned;
+    function csvToArray(str) {
+      const rows = str.trim().split("\n");
+      const headers = rows[0].split(",");
+      return rows.slice(1).map(row => {
+        const values = row.split(",");
+        let obj = {};
+        headers.forEach((h, i) => obj[h.trim().toUpperCase()] = values[i] ? values[i].trim() : "");
+        return obj;
       });
-      console.log("? CSV dimuat:", dataAhli.length, "rekod");
     }
 
     async function semakData() {
-      const icInput = document.getElementById('icInput').value.trim();
-      const status = document.getElementById('status');
-      status.textContent = '';
+      if (data.length === 0) await loadCSV();
+      const icInput = document.getElementById("inputIC").value.replace(/-/g, "");
+      const match = data.find(row => (row["NO KAD PENGENALAN"] || "").replace(/-/g, "") === icInput);
 
-      if (!icInput) {
-        status.textContent = '?? Sila masukkan No Kad Pengenalan.';
-        return;
-      }
+      if (match) {
+        document.getElementById("semakContainer").classList.add("hidden");
+        document.getElementById("resultContainer").classList.remove("hidden");
 
-      if (dataAhli.length === 0) await loadCSV();
+        document.getElementById("nama").innerText = match["NAMA"] || "-";
+        document.getElementById("ic").innerText = match["NO KAD PENGENALAN"] || "-";
+        document.getElementById("plan").innerText = match["PLAN"] || "-";
+        document.getElementById("phone").innerText = match["NO TELEFON"] || "-";
+        document.getElementById("bank").innerText = match["NAMA BANK"] || "-";
+        document.getElementById("acc").innerText = match["NO AKAUN"] || "-";
 
-      const rekod = dataAhli.find(r => (r['NO KAD PENGENALAN'] || '').replace(/[^0-9]/g, '') === icInput.replace(/[^0-9]/g, ''));
-
-      if (!rekod) {
-        status.textContent = '? Data tidak dijumpai.';
-        return;
-      }
-
-      // Tukar ke paparan hasil
-      document.getElementById('searchBox').style.display = 'none';
-      document.getElementById('resultPage').style.display = 'block';
-
-      // Isi maklumat atas
-      document.getElementById('nama').textContent = rekod['NAMA'] || '-';
-      document.getElementById('nokp').textContent = rekod['NO KAD PENGENALAN'] || '-';
-      document.getElementById('notel').textContent = rekod['NO TELEFON'] || '-';
-      document.getElementById('bank').textContent = rekod['NAMA BANK'] || '-';
-      document.getElementById('akaun').textContent = rekod['NO AKAUN'] || '-';
-
-      // Isi senarai plan
-      const tbody = document.querySelector('#planTable tbody');
-      tbody.innerHTML = '';
-      let bil = 1;
-      let total = 0;
-
-      for (const key in rekod) {
-        if (!['NAMA','NO KAD PENGENALAN','NO TELEFON','NAMA BANK','NO AKAUN','PLAN'].includes(key)) {
-          const value = rekod[key];
-          if (value && value.trim() !== '') {
-            const numValue = parseFloat(value.replace(/[^0-9.]/g, '')) || 0;
-            total += numValue;
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-              <td>${bil++}</td>
-              <td>${key}</td>
-              <td></td>
-              <td>${value}</td>
-            `;
-            tbody.appendChild(tr);
+        const summary = document.getElementById("summaryBoard");
+        summary.innerHTML = "";
+        Object.keys(match).forEach(key => {
+          if (!["NAMA","NO KAD PENGENALAN","PLAN","NO TELEFON","NAMA BANK","NO AKAUN"].includes(key) && match[key]) {
+            summary.innerHTML += `<p><strong>${key}:</strong> ${match[key]}</p>`;
           }
-        }
+        });
+      } else {
+        alert("? Data tidak dijumpai!");
       }
-
-      // Papar jumlah keseluruhan
-      document.getElementById('totalBox').textContent = 
-        `JUMLAH KESELURUHAN: RM${total.toLocaleString('ms-MY', {minimumFractionDigits: 2})}`;
     }
 
     function kembali() {
-      document.getElementById('resultPage').style.display = 'none';
-      document.getElementById('searchBox').style.display = 'block';
-      document.getElementById('icInput').value = '';
-      document.getElementById('status').textContent = '';
+      document.getElementById("resultContainer").classList.add("hidden");
+      document.getElementById("semakContainer").classList.remove("hidden");
     }
   </script>
 </body>
 </html>
-
