@@ -8,7 +8,6 @@ SHEET_URL = ("https://docs.google.com/spreadsheets/d/e/2PACX-1vRJgCHqA6X4rpAiBTA
 
 @app.after_request
 def add_cors_headers(response):
-    """Tambah header CORS untuk benarkan semua domain akses"""
     response.headers["Access-Control-Allow-Origin"] = "*"
     response.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"
     response.headers["Access-Control-Allow-Headers"] = "Content-Type"
@@ -24,7 +23,8 @@ def sheet_csv():
         res = requests.get(SHEET_URL)
         res.raise_for_status()
         response = Response(res.text, content_type="text/csv")
-        response.headers["Access-Control-Allow-Origin"] = "*"  # Penting!
+        # tambahan header CORS
+        response.headers["Access-Control-Allow-Origin"] = "*"
         return response
     except Exception as e:
         return Response(f"Error: {str(e)}", status=500)
@@ -32,4 +32,3 @@ def sheet_csv():
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))
     app.run(host='0.0.0.0', port=port)
-
